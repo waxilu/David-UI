@@ -330,3 +330,37 @@ func TestNodeDelete_CleansNodeBaselines(t *testing.T) {
 		t.Errorf("node 8 baseline should survive, found %d", eightCnt)
 	}
 }
+
+func TestSetRemoteTraffic_NodeRemarkMultiplier(t *testing.T) {
+	db := initTrafficTestDB(t)
+	svc := &InboundService{}
+
+	// Seed node with Remark "1.5"
+	node := model.Node{Id: 10, Name: "test-node-1.5", Address: "1.2.3.4", ApiToken: "tok", Remark: "1.5"}
+	if err := db.Create(&node).Error; err != nil {
+		t.Fatalf("seed node: %v", err)
+	}
+
+	settings := `{"clients":[{"id":"c1","email":"user15@example.com"}]}`
+
+	// Baseline sync: 100 up, 100 down
+	syncNodeWithSettings(t, svc, 10, "tag1", settings, xray.ClientTraffic{Email: "user15@example.com", Up: 100, Down: 100})
+
+	// Second sync: 200 up (+100 delta), 300 down (+200 delta). With 1.5x multiplier -> +150 up, +300 down.
+	syncNodeWithSettings(t, svc, 10, "tag1", settings, xray.ClientTraffic{Email: "user15@example.com", Up: 200, Down: 300})
+
+	ct := readTraffic(t, db, "user15@example.com")
+	assertUpDown(t, ct, 250, 400, "after 1.5x multiplier delta")
+
+	// Seed node with text Remark "Germany Server" -> fallback 1.0x
+	nodeText := model.Node{Id: 11, Name: "test-node-text", Address: "1.2.3.5", ApiToken: "tok", Remark: "Germany Server"}
+	if err := db.Create(&nodeText).Error; err != nil {
+		t.Fatalf("seed node: %v", err)
+	}
+	settingsText := `{"clients":[{"id":"c2","email":"userText@example.com"}]}`
+	syncNodeWithSettings(t, svc, 11, "tag2", settingsText, xray.ClientTraffic{Email: "userText@example.com", Up: 100, Down: 100})
+	syncNodeWithSettings(t, svc, 11, "tag2", settingsText, xray.ClientTraffic{Email: "userText@example.com", Up: 200, Down: 300})
+	ctText := readTraffic(t, db, "userText@example.com")
+	assertUpDown(t, ctText, 200, 300, "text remark should fallback to 1.0x (100+100, 100+200)")
+}
+

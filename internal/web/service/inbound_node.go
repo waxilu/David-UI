@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -177,12 +178,22 @@ func (s *InboundService) setRemoteTrafficLocked(nodeID int, snap *runtime.Traffi
 	// empty result (old-build node with no GUID yet) leaves attribution to the
 	// node_id fallback downstream (#4983).
 	var nodeRow model.Node
-	db.Select("guid").Where("id = ?", nodeID).First(&nodeRow)
+	db.Select("guid", "remark").Where("id = ?", nodeID).First(&nodeRow)
 	originGuidFor := func(snapIb *model.Inbound) string {
 		if snapIb.OriginNodeGuid != "" {
 			return snapIb.OriginNodeGuid
 		}
 		return nodeRow.Guid
+	}
+
+	nodeMultiplier := 1.0
+	if nodeRow.Remark != "" {
+		clean := strings.TrimSpace(nodeRow.Remark)
+		clean = strings.TrimPrefix(clean, "x")
+		clean = strings.TrimPrefix(clean, "X")
+		if m, err := strconv.ParseFloat(clean, 64); err == nil && m >= 1.0 {
+			nodeMultiplier = m
+		}
 	}
 
 	var central []model.Inbound
@@ -511,9 +522,11 @@ func (s *InboundService) setRemoteTrafficLocked(nodeID int, snap *runtime.Traffi
 				}
 			}
 
-			// ========= 2xNodes =========
-			deltaUp = deltaUp * 2
-			deltaDown = deltaDown * 2
+			// ========= Node Traffic Multiplier (from Node Remark) =========
+			if nodeMultiplier > 1.0 {
+				deltaUp = int64(float64(deltaUp) * nodeMultiplier)
+				deltaDown = int64(float64(deltaDown) * nodeMultiplier)
+			}
 			// ===============================================
 
 			if _, rowExists := existingEmails[cs.Email]; !rowExists {
