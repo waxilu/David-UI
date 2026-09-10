@@ -824,72 +824,20 @@ export interface SupportedLanguage {
 
 export class LanguageManager {
   static readonly supportedLanguages: readonly SupportedLanguage[] = [
-    { name: 'العربية', value: 'ar-EG', icon: '🇪🇬' },
     { name: 'English', value: 'en-US', icon: '🇺🇸' },
-    { name: 'فارسی', value: 'fa-IR', icon: '🇮🇷' },
-    { name: '简体中文', value: 'zh-CN', icon: '🇨🇳' },
-    { name: '繁體中文', value: 'zh-TW', icon: '🇹🇼' },
-    { name: '日本語', value: 'ja-JP', icon: '🇯🇵' },
-    { name: 'Русский', value: 'ru-RU', icon: '🇷🇺' },
-    { name: 'Tiếng Việt', value: 'vi-VN', icon: '🇻🇳' },
-    { name: 'Español', value: 'es-ES', icon: '🇪🇸' },
-    { name: 'Indonesian', value: 'id-ID', icon: '🇮🇩' },
-    { name: 'Український', value: 'uk-UA', icon: '🇺🇦' },
-    { name: 'Türkçe', value: 'tr-TR', icon: '🇹🇷' },
-    { name: 'Português', value: 'pt-BR', icon: '🇧🇷' },
   ];
 
   static getLanguage(): string {
-    let lang = CookieManager.getCookie('lang');
-    if (lang) return lang;
-
-    if (window.navigator) {
-      const nav = window.navigator as Navigator & { userLanguage?: string };
-      lang = nav.language || nav.userLanguage || '';
-
-      const simularLangs: [string, string][] = [
-        ['ar', LanguageManager.supportedLanguages[0].value],
-        ['fa', LanguageManager.supportedLanguages[2].value],
-        ['ja', LanguageManager.supportedLanguages[5].value],
-        ['ru', LanguageManager.supportedLanguages[6].value],
-        ['vi', LanguageManager.supportedLanguages[7].value],
-        ['es', LanguageManager.supportedLanguages[8].value],
-        ['id', LanguageManager.supportedLanguages[9].value],
-        ['uk', LanguageManager.supportedLanguages[10].value],
-        ['tr', LanguageManager.supportedLanguages[11].value],
-        ['pt', LanguageManager.supportedLanguages[12].value],
-      ];
-
-      simularLangs.forEach((pair) => {
-        if (lang === pair[0]) {
-          lang = pair[1];
-        }
-      });
-
-      if (LanguageManager.isSupportLanguage(lang)) {
-        CookieManager.setCookie('lang', lang, 365);
-      } else {
-        CookieManager.setCookie('lang', 'en-US', 365);
-        window.location.reload();
-      }
-    } else {
-      CookieManager.setCookie('lang', 'en-US', 365);
-      window.location.reload();
-    }
-
-    return lang;
+    return 'en-US';
   }
 
   static setLanguage(language: string): void {
-    if (!LanguageManager.isSupportLanguage(language)) {
-      language = 'en-US';
-    }
-    CookieManager.setCookie('lang', language, 365);
+    CookieManager.setCookie('lang', 'en-US', 365);
     window.location.reload();
   }
 
   static isSupportLanguage(language: string): boolean {
-    return LanguageManager.supportedLanguages.some((lang) => lang.value === language);
+    return language === 'en-US';
   }
 }
 
