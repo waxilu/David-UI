@@ -243,7 +243,7 @@ export default function NodeFormModal({
             </Col>
             <Col xs={24} md={12}>
               <Form.Item label={t('pages.nodes.remark')} name="remark">
-                <Input />
+                <Input placeholder={t('pages.nodes.remarkPlaceholder')} />
               </Form.Item>
             </Col>
           </Row>
