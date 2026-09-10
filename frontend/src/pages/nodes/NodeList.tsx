@@ -21,8 +21,6 @@ import {
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
-  EyeInvisibleOutlined,
-  EyeOutlined,
   InfoCircleOutlined,
   MoreOutlined,
   PlusOutlined,
@@ -173,7 +171,6 @@ export default function NodeList({
   const { t } = useTranslation();
   const relativeTime = useRelativeTime();
 
-  const [showAddress, setShowAddress] = useState(false);
   const [statsNode, setStatsNode] = useState<NodeRow | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
@@ -287,18 +284,7 @@ export default function NodeList({
       ),
     },
     {
-      title: (
-        <span className="address-header">
-          {t('pages.nodes.address')}
-          <Tooltip title={t('pages.index.toggleIpVisibility')}>
-            {showAddress ? (
-              <EyeOutlined className="ip-toggle-icon" onClick={() => setShowAddress(false)} />
-            ) : (
-              <EyeInvisibleOutlined className="ip-toggle-icon" onClick={() => setShowAddress(true)} />
-            )}
-          </Tooltip>
-        </span>
-      ),
+      title: t('pages.nodes.address'),
       dataIndex: 'url',
       ellipsis: true,
       render: (_value, record) => (
@@ -306,7 +292,6 @@ export default function NodeList({
           href={record.url}
           target="_blank"
           rel="noopener noreferrer"
-          className={showAddress ? 'address-visible' : 'address-hidden'}
         >
           {record.url}
         </a>
@@ -409,7 +394,7 @@ export default function NodeList({
       width: 120,
       render: (_value, record) => relativeTime(record.lastHeartbeat),
     },
-  ], [t, showAddress, relativeTime, latestVersion, onToggleEnable, onProbe, onEdit, onDelete, onUpdateNode, nameByGuid]);
+  ], [t, relativeTime, latestVersion, onToggleEnable, onProbe, onEdit, onDelete, onUpdateNode, nameByGuid]);
 
   return (
     <Card size="small" hoverable>
@@ -528,17 +513,9 @@ export default function NodeList({
                     href={statsNode.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={showAddress ? 'address-visible' : 'address-hidden'}
                   >
                     {statsNode.url}
                   </a>
-                  <Tooltip title={t('pages.index.toggleIpVisibility')}>
-                    {showAddress ? (
-                      <EyeOutlined className="ip-toggle-icon" onClick={() => setShowAddress(false)} />
-                    ) : (
-                      <EyeInvisibleOutlined className="ip-toggle-icon" onClick={() => setShowAddress(true)} />
-                    )}
-                  </Tooltip>
                 </div>
                 <div className="stat-row">
                   <span className="stat-label">{t('pages.nodes.status')}</span>

@@ -27,8 +27,6 @@ import {
   AreaChartOutlined,
   GlobalOutlined,
   SwapOutlined,
-  EyeOutlined,
-  EyeInvisibleOutlined,
   ThunderboltOutlined,
   DesktopOutlined,
   DatabaseOutlined,
@@ -73,7 +71,6 @@ export default function IndexPage() {
 
   const basePath = window.X_UI_BASE_PATH || '';
 
-  const [showIp, setShowIp] = useState(false);
   const [logsOpen, setLogsOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
   const [panelUpdateOpen, setPanelUpdateOpen] = useState(false);
@@ -378,26 +375,8 @@ export default function IndexPage() {
                     <Card
                       title={t('pages.index.ipAddresses')}
                       hoverable
-                      extra={
-                        <Tooltip
-                          title={t('pages.index.toggleIpVisibility')}
-                          placement={isMobile ? 'topRight' : 'top'}
-                        >
-                          {showIp ? (
-                            <EyeOutlined
-                              className="ip-toggle-icon"
-                              onClick={() => setShowIp(false)}
-                            />
-                          ) : (
-                            <EyeInvisibleOutlined
-                              className="ip-toggle-icon"
-                              onClick={() => setShowIp(true)}
-                            />
-                          )}
-                        </Tooltip>
-                      }
                     >
-                      <Row className={showIp ? 'ip-visible' : 'ip-hidden'} gutter={isMobile ? [8, 8] : 0}>
+                      <Row gutter={isMobile ? [8, 8] : 0}>
                         <Col span={isMobile ? 24 : 12}>
                           <Statistic
                             title="IPv4"
